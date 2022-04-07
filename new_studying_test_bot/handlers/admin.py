@@ -27,6 +27,16 @@ async def cm_start(message: types.Message):
         await FSMAdmin.photo.set()
         await message.reply('upload a photo')
 
+#@dp.message_handler(state="*", commands=['cancel'])
+#@dp.message_handler(Text(equals='cancel', ignore_case=True), state="*")
+async def cancel_handler(message: types.Message, state: FSMContext):
+    if message.from_user.id == ID:
+        current_state = await state.get_state()
+        if current_state is None:
+            return
+        await state.finish()
+        await message.reply('ok')
+
 # catch the 1st answer, write into the dict by id
 #@dp.message_handler(content_types=['photo'], state=FSMAdmin.photo)
 async def upload_photo(message: types.Message, state: FSMContext):
@@ -66,26 +76,17 @@ async def set_price(message: types.Message, state: FSMContext):
 
         await state.finish()
 
-#@dp.message_handler(state="*", commands=['cancel'])
-#@dp.message_handler(Text(equals='cancel', ignore_case=True), state="*")
-async def cancel_handler(message: types.Message, state: FSMContext):
-    if message.from_user.id == ID:
-        current_state = await state.get_state()
-        if current_state is None:
-            return
-        await state.finish()
-        await message.reply('ok')
 
 # reg handlers
 def register_handlers_admin(dp: Dispatcher):
     dp.register_message_handler(cm_start, commands=['upload_photo'], state=None)
+    dp.register_message_handler(cancel_handler, Text(equals='cancel', ignore_case=True), state="*")
+    dp.register_message_handler(check_if_admin, commands=['moderator'], is_chat_admin=True)
     dp.register_message_handler(upload_photo, content_types=['photo'], state=FSMAdmin.photo)
     dp.register_message_handler(set_loc_name, state=FSMAdmin.location_name)
     dp.register_message_handler(set_description, state=FSMAdmin.description)
     dp.register_message_handler(set_price, state=FSMAdmin.tour_price)
     dp.register_message_handler(cancel_handler, state="*", commands=['cancel'])
-    dp.register_message_handler(cancel_handler, Text(equals='cancel', ignore_case=True), state="*")
-    dp.register_message_handler(check_if_admin, commands=['moderator'], is_chat_admin=True)
 
 
 

@@ -1,5 +1,5 @@
 import psycopg2
-
+from new_studying_test_bot.create_bot import dp, bot
 
 
 data1 = {'photo': '12345', 'location_name': 'Ufa', 'description': 'capital city of Rebuplic of Bashkortostan', 'tour_price': 10000}
@@ -21,3 +21,8 @@ async def sql_add_line(state):
         cur.execute("insert into traveltours (photo, location_name, description, tour_price) values (%s, %s, %s, %s)", tuple(data.values()))
         conn.commit()
 
+async def sql_read(message):
+    cur.execute('select * from traveltours')
+    full_table = cur.fetchall()
+    for ret in full_table:
+        await bot.send_photo(message.from_user.id, ret[1], f'{ret[2]}\nDescription: {ret[3]}\nPrice: {ret[4]}')

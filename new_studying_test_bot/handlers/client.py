@@ -1,6 +1,7 @@
 from aiogram import types, Dispatcher
 from new_studying_test_bot.create_bot import dp, bot
 from new_studying_test_bot.keyboards import kb_client
+from new_studying_test_bot.database import pgdb
 
 #@dp.message_handler(commands=['start'])
 async def command_start(message: types.Message):
@@ -27,8 +28,12 @@ async def show_tours(message: types.Message):
     await bot.send_message(message.from_user.id, 'no available tours yet', disable_web_page_preview=True,
                            protect_content=True, allow_sending_without_reply=False)
 
+@dp.message_handler(commands='tours')
+async def tours_menu_command(message: types.Message):
+    await pgdb.sql_read(message)
+
 def register_handlers_client(dp: Dispatcher):
     dp.register_message_handler(command_start, commands=['start'])
     dp.register_message_handler(command_help, commands=['help'])
     dp.register_message_handler(show_contacts, commands=['contacts'])
-    dp.register_message_handler(show_tours, commands=['tours'])
+    dp.register_message_handler(tours_menu_command, commands=['tours'])

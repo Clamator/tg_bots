@@ -1,8 +1,10 @@
 from aiogram.utils import executor
 from create_bot import dp
+from database import pgdb
 
 async def on_startup(_):
     print('bot is online')
+    pgdb.sql_start()
 
 from new_studying_test_bot.handlers import client, admin, other
 

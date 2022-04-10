@@ -1,9 +1,11 @@
 from aiogram.dispatcher.filters import Text
-
+from new_studying_test_bot.database import pgdb
 from new_studying_test_bot.create_bot import dp, bot
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram import types, Dispatcher
+from new_studying_test_bot.keyboards import admin_kb
+
 
 ID = None
 
@@ -17,7 +19,7 @@ class FSMAdmin(StatesGroup):
 async def check_if_admin(message: types.Message):
     global ID
     ID = message.from_user.id
-    await bot.send_message(message.from_user.id, 'what to do?') #, reply_markup=button_case_admin)
+    await bot.send_message(message.from_user.id, 'what to do?', reply_markup=admin_kb.kb_admin)
     await message.delete()
 
 # main handler to add tour
@@ -71,9 +73,7 @@ async def set_price(message: types.Message, state: FSMContext):
         async with state.proxy() as data:
             data['tour_price'] = float(message.text)
 
-        async with state.proxy() as data:
-            await message.reply(str(data))
-
+        await pgdb.sql_add_line(state)
         await state.finish()
 
 
